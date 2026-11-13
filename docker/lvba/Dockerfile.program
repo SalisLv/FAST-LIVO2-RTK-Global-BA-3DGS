@@ -1,0 +1,9 @@
+FROM bag-to-3dgs-lvba-base:local
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR /lvba_ws
+COPY . /lvba_ws/src/Global-LVBA
+COPY --from=bag-to-3dgs-ros-dev:local /opt/rpg_vikit /lvba_ws/src/rpg_vikit
+RUN cmake -S src/Global-LVBA/src/SiftGPU -B src/Global-LVBA/src/SiftGPU/build -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build src/Global-LVBA/src/SiftGPU/build -j2
+RUN source /opt/ros/noetic/setup.bash \
+    && catkin_make -j1 -l2 -DCMAKE_BUILD_TYPE=Release

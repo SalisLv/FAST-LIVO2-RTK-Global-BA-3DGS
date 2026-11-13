@@ -1,0 +1,9 @@
+/src/
+/runs/
+/.deps/
+__pycache__/
+*.bag
+*.pcd
+*.ply
+*.pth
+*.db

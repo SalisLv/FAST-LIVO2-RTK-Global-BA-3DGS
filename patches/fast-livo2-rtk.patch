@@ -1,0 +1,49 @@
+diff --git a/src/optimization.cpp b/src/optimization.cpp
+index 7aabc9a..79ce58d 100644
+--- a/src/optimization.cpp
++++ b/src/optimization.cpp
+@@ -174,6 +174,22 @@ void optimization::offlineOptimizationTask() {
+     trimTrajectoryByTime();
+ 
+     initialAlign();
++    if (gpsQueue_B.size() != cloudKeyPoses6D->size() || cloudKeyPoses6D->size() < 3) {
++        ROS_ERROR("RTK alignment failed or produced too few matched poses.");
++        return;
++    }
++    const auto saveImuTrajectory = [&](const std::string& name) {
++        std::ofstream file(outputfilepath + "/TUM/" + name + ".txt");
++        file << "# timestamp tx ty tz qx qy qz qw\n" << std::fixed << std::setprecision(9);
++        for (size_t i = 0; i < cloudKeyPoses6D->size(); ++i) {
++            const auto pose = initialEstimate.at<gtsam::Pose3>(i).compose(T_imu_rtk.inverse());
++            const auto p = pose.translation();
++            const auto q = pose.rotation().toQuaternion();
++            file << cloudKeyPoses6D->points[i].time << " " << p.x() << " " << p.y() << " " << p.z()
++                 << " " << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << "\n";
++        }
++    };
++    saveImuTrajectory("aligned_imu_before_rtk");
+     std::cout << "[Offline Optimization] Initial alignment done." << std::endl;
+     writeOptimizedTumTrajectory();
+     saveOptimizedGlobalMap();
+@@ -187,9 +203,11 @@ void optimization::offlineOptimizationTask() {
+     params.setAbsoluteErrorTol(1e-9);
+     
+     buildBatchGraph();
++    std::cout << "[HH experiment] RTK factors: " << gtSAMgraph.size() - initialEstimate.size() << std::endl;
+     gtsam::LevenbergMarquardtOptimizer optimizer(gtSAMgraph, initialEstimate);
+     gtsam::Values result = optimizer.optimize();
+     initialEstimate = result;
++    saveImuTrajectory("enu_imu_after_rtk");
+     std::cout << "[Offline Optimization] First optimization pass done." <<  std::endl;
+ 
+     is_optimized = true;
+@@ -795,7 +813,8 @@ void optimization::saveOptimizedGlobalMap()
+ 
+     for (size_t i = 0; i < cloudKeyPoses6D->size(); ++i)
+     {
+-        Eigen::Affine3f transform = pclPointToAffine3f(cloudKeyPoses6D->points[i]);
++        const auto body = initialEstimate.at<gtsam::Pose3>(i).compose(T_imu_rtk.inverse());
++        const Eigen::Affine3f transform(body.matrix().cast<float>());
+         PointCloudXYZRGB::Ptr original_cloud = surfCloudKeyFrames[i];
+         PointCloudXYZRGB::Ptr transformed_cloud(new PointCloudXYZRGB());
+         pcl::transformPointCloud(*original_cloud, *transformed_cloud, transform);

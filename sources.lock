@@ -1,0 +1,9 @@
+# Directory URL Git commit
+src/FAST-LIVO2-RTK https://github.com/WilsonGuo/FAST-LIVO2-RTK.git 185eeaa9c23455e56b76f97b249db437ca69c25f
+src/Global-LVBA https://github.com/WilsonGuo/Global-LVBA.git 956e1c16d00e05f0190a55951fcd422e986b059c
+src/gaussian-splatting https://github.com/graphdeco-inria/gaussian-splatting.git 54c035f7834b564019656c3e3fcc3646292f727d
+src/gnss_comm https://github.com/HKUST-Aerial-Robotics/gnss_comm.git a2035fec1cc427bba184d25ff1fde8dcf23c9ce1
+.deps/Sophus https://github.com/strasdat/Sophus.git a621ff2e56c56c839a6c40418d42c3c254424b5c
+.deps/rpg_vikit https://github.com/xuankuzcr/rpg_vikit.git 6c886c8e5d83997806e00294826d528cea3581dd
+.deps/gtsam https://github.com/borglab/gtsam.git 4f66a491ffc83cf092d0d818b11dc35135521612
+.deps/ceres-solver https://github.com/ceres-solver/ceres-solver.git f68321e7de8929fbcdb95dd42877531e64f72f66

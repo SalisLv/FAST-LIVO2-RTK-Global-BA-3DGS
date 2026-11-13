@@ -1,0 +1,12 @@
+FROM bag-to-3dgs-cuda:local
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR /opt/gaussian-splatting
+COPY . .
+ENV MAX_JOBS=1
+RUN nvidia_path=$(python -c 'import site; print(site.getsitepackages()[0] + "/nvidia")') \
+    && export CPATH=$(find "$nvidia_path" -type d -name include -print | paste -sd:) \
+    && python -m pip install --no-build-isolation --no-deps \
+       ./submodules/diff-gaussian-rasterization ./submodules/simple-knn ./submodules/fused-ssim \
+    && python -c 'import diff_gaussian_rasterization, simple_knn._C, fused_ssim'
+RUN python -m pip install --no-cache-dir --no-deps opencv-python-headless==4.12.0.88 joblib==1.5.2 \
+    && python -c 'import cv2, joblib'

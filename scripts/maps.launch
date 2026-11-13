@@ -1,0 +1,13 @@
+<launch>
+  <arg name="pcd_file" />
+  <arg name="config_file" default="/pipeline/maps.rviz" />
+  <arg name="gui" default="true" />
+  <node pkg="pcl_ros" type="pcd_to_pointcloud" name="hh_map" output="screen">
+    <param name="file_name" value="$(arg pcd_file)" />
+    <param name="interval" value="0" />
+    <param name="frame_id" value="map" />
+    <param name="latch" value="true" />
+    <remap from="cloud_pcd" to="/global_map" />
+  </node>
+  <node if="$(arg gui)" pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg config_file)" />
+</launch>

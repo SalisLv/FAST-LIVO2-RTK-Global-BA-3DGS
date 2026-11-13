@@ -1,0 +1,14 @@
+diff --git a/scene/gaussian_model.py b/scene/gaussian_model.py
+index 473887d..ce6769b 100644
+--- a/scene/gaussian_model.py
++++ b/scene/gaussian_model.py
+@@ -251,7 +251,8 @@ class GaussianModel:
+ 
+         elements = np.empty(xyz.shape[0], dtype=dtype_full)
+         attributes = np.concatenate((xyz, normals, f_dc, f_rest, opacities, scale, rotation), axis=1)
+-        elements[:] = list(map(tuple, attributes))
++        for column, attribute in enumerate(elements.dtype.names):
++            elements[attribute] = attributes[:, column]
+         el = PlyElement.describe(elements, 'vertex')
+         PlyData([el]).write(path)
+ 
